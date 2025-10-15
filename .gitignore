@@ -1,0 +1,7 @@
+venv/
+main.build/
+main.onefile-build/
+dist/
+build/
+__pycache__/
+main.dist/
