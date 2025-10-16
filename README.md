@@ -10,6 +10,8 @@ Data file sources:
 
 ---
 
+Assumes Linux, Windows is similar (replace python3 with py usually)
+
 ## Usage
 Install the required libraries:
 ```
@@ -23,6 +25,13 @@ python main.py
 ## Building self-contained executable
 I recommend creating a virtual environment and using it to build the executable, this will make the final package smaller:
 ```
+python3 -m venv venv
+
+source venv/bin/activate
+
+pip install -r requirements.txt
+
 pip install pyinstaller
+
 python3 -m PyInstaller --onefile --add-data "./table_yx_3_v1710.dat:." --add-data "./CR-2005_v1005.dat:." --noconsole main.py
 ```
