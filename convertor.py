@@ -68,60 +68,13 @@ def get_quasigeoid_correction(latitude, longitude):
 
 
     # Calculate the actual grid point coordinates
+    # make sure to only round up lat0 and lon0 after were done doing math with it
     lat0 = start_lat + lat_idx * dlat
     lon0 = start_lon + lon_idx * dlon
     lat1 = round(lat0 + dlat, 3)
     lon1 = round(lon0 + dlon, 3)
     lat0 = round(lat0, 3)
     lon0 = round(lon0, 3)
-
-    '''x = 0
-    prevx = 0
-    prevy = 0
-    prevx2 = 0
-    prevy2 = 0
-    for t in QUASIGEOID.keys():
-        try:
-            if float(t[0]) > lat0:
-                x = float(t[0])
-                break
-            prevx = float(t[0])
-        except:
-            pass
-    for t in QUASIGEOID.keys():
-        try:
-            if float(t[1]) > lon0:
-                x = float(t[1])
-                break
-            prevy = float(t[1])
-        except:
-            pass
-    for t in QUASIGEOID.keys():
-        try:
-            if float(t[0]) > lat1:
-                x = float(t[0])
-                break
-            prevx2 = float(t[0])
-        except:
-            pass
-    for t in QUASIGEOID.keys():
-        try:
-            if float(t[1]) > lon1:
-                x = float(t[1])
-                break
-            prevy2 = float(t[1])
-        except:
-            pass
-    print(lat0)
-    print(lon0)
-    print(lat1)
-    print(lon1)
-    print(x)
-    print(prevx)
-    print(prevy)
-    print(prevx2)
-    print(prevy2)'''
-
 
     try:
         # Get values at the four corners
@@ -149,11 +102,8 @@ def get_quasigeoid_correction(latitude, longitude):
 readQuasigeoid()
 readCoef(CORRTABLE)
 
-
-
-
 # Conversion from WGS-84 to JTSK
-def convertToJTSK(latitude, longitude, height=0):
+def convertToJTSK(latitude, longitude, height=0) -> list[float] | list[None]:
     if not isinstance(longitude, (int, float)) or not isinstance(latitude, (int, float)):
         return [None, None]
     if latitude < 40 or latitude > 60 or longitude < 5 or longitude > 25:
@@ -176,7 +126,7 @@ def convertToJTSK(latitude, longitude, height=0):
 
 
 # Conversion from JTSK to WGS-84
-def convertToWGS84(minusY, minusX, height=0):
+def convertToWGS84(minusY, minusX, height=0) -> list[float] | list[None]:
     if not isinstance(minusY, (int, float)) or not isinstance(minusX, (int, float)):
         return [None, None]
     if minusY < -905000 or minusY > -400000 or minusX < -1230000 or minusX > -930000:
@@ -612,7 +562,8 @@ def get_multi_transform_to_sjtsk(wgs_points):
     my = []
     for i in wgs_points:
         [x1, x2] = convertToJTSK(float(i[0]), float(i[1]))
-        my.append([str(round(x1, 2)), str(round(x2, 2))])
+        if x1 is not None and x2 is not None:
+            my.append([str(round(x1, 2)), str(round(x2, 2))])
     return my
 
 
@@ -620,7 +571,8 @@ def get_multi_transform_to_wgs84(jtsk_points):
     my = []
     for i in jtsk_points:
         [x1, x2] = convertToWGS84(float(i[0]), float(i[1]))
-        my.append([str(round(x1, 7)), str(round(x2, 7))])
+        if x1 is not None and x2 is not None:
+            my.append([str(round(x1, 7)), str(round(x2, 7))])
     return my
 
 
