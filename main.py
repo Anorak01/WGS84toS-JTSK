@@ -17,7 +17,6 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QPushButton,
     QCheckBox,
-    QHBoxLayout
 )
 
 class MainWindow(QMainWindow):
@@ -29,32 +28,23 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Překladátor")
 
-        self.label = QLabel()
+        self.label = QLabel() # Label for input file name
 
-        self.input = QLineEdit()
-        self.input.textChanged.connect(self.label.setText)
-
-        self.button = QPushButton("Open", self)
+        self.button = QPushButton("Open", self) # Button that opens file dialog
         self.button.clicked.connect(self.buttonclick)
 
-        self.savebutton = QPushButton("Pick Save Directory", self)
+        self.savebutton = QPushButton("Pick Save Directory", self) # Button that opens file(folder) dialog
         self.savebutton.clicked.connect(self.savebuttonclick)
 
-        self.savelabel = QLabel()
+        self.savelabel = QLabel() # Label for save directory
 
-        self.translatebutton = QPushButton("Translate", self)
+        self.translatebutton = QPushButton("Translate", self) # Button to trigger conversion
         self.translatebutton.clicked.connect(self.run_translate)
 
-        self.done_label = QLabel("")
+        self.done_label = QLabel("") # Label to display status
 
-
-        # checkbox
+        # checkbox to toggle negative XY
         self.checkbox = QCheckBox("Negative XY", self)
-
-        #self.convertlayout = QHBoxLayout(self)
-        #self.convertlayout.addWidget(self.checkbox)
-        #self.convertlayout.addWidget(self.translatebutton)
-
 
         layout = QVBoxLayout()
         layout.addWidget(self.button)
@@ -63,7 +53,6 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.savelabel)
         layout.addWidget(self.translatebutton)
         layout.addWidget(self.checkbox)
-        #layout.addLayout(self.convertlayout)
         layout.addWidget(self.done_label)
 
         container = QWidget()
