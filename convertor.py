@@ -103,7 +103,7 @@ readQuasigeoid()
 readCoef(CORRTABLE)
 
 # Conversion from WGS-84 to JTSK
-def convertToJTSK(latitude, longitude, height=0) -> list[float] | list[None]:
+def convertToJTSK(latitude, longitude, height: float = 0) -> list[float] | list[None]:
     if not isinstance(longitude, (int, float)) or not isinstance(latitude, (int, float)):
         return [None, None]
     if latitude < 40 or latitude > 60 or longitude < 5 or longitude > 25:
