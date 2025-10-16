@@ -3,9 +3,9 @@
 This tool has been made to convert xlsx files of specific format with WGS84 coordinates to a specific txt format with S-JTSK coordinates.
 
 Data file sources:
-(CR-2005_v1005)[https://cuzk.gov.cz/Zememerictvi/Geodeticke-zaklady-na-uzemi-CR/GNSS/Nova-realizace-systemu-ETRS89-v-CR/CR-2005_v1005.aspx]
+[CR-2005_v1005](https://cuzk.gov.cz/Zememerictvi/Geodeticke-zaklady-na-uzemi-CR/GNSS/Nova-realizace-systemu-ETRS89-v-CR/CR-2005_v1005.aspx)
 
-(table_yx_3_v1710)[https://cuzk.gov.cz/Zememerictvi/Geodeticke-zaklady-na-uzemi-CR/GNSS/Nova-realizace-systemu-ETRS89-v-CR/table_yx_3_v1710.aspx]
+[table_yx_3_v1710](https://cuzk.gov.cz/Zememerictvi/Geodeticke-zaklady-na-uzemi-CR/GNSS/Nova-realizace-systemu-ETRS89-v-CR/table_yx_3_v1710.aspx)
 
 ---
 
