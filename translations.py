@@ -1,0 +1,40 @@
+t = {
+    "en": {
+        "window_title": "Translator",
+        "pick_input": "Pick input file",
+        "pick_save_dir": "Pick Save Directory",
+        "translate": "Translate",
+        "negative_xy": "Negative XY",
+        "convert_height": "Convert Height",
+        "file_to_translate": "File to translate: ",
+        "not_excel_error": "Selected file is not an Excel sheet",
+        "save_directory": "Save directory: ",
+        "done": "Done!",
+        "error": "Error!",
+        "language_menu": "Language",
+        "language_en": "English",
+        "language_cs": "Czech",
+        "processing": "Processing...",
+        "no_file_error": "Please select a valid Excel file first",
+        "no_dir_error": "Please select a save directory first"
+    },
+    "cs": {
+        "window_title": "Překladač",
+        "pick_input": "Vybrat vstupní soubor",
+        "pick_save_dir": "Vybrat cílovou složku",
+        "translate": "Přeložit",
+        "negative_xy": "Záporné XY",
+        "convert_height": "Převést výšku",
+        "file_to_translate": "Soubor k překladu: ",
+        "not_excel_error": "Vybraný soubor není Excel tabulka",
+        "save_directory": "Cílová složka: ",
+        "done": "Hotovo!",
+        "error": "Chyba!",
+        "language_menu": "Jazyk",
+        "language_en": "Anglicky",
+        "language_cs": "Česky",
+        "processing": "Zpracovávání...",
+        "no_file_error": "Nejprve vyberte platný Excel soubor",
+        "no_dir_error": "Nejprve vyberte cílovou složku"
+    }
+}

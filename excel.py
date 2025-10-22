@@ -22,7 +22,7 @@ class Record:
     description: String
     h: String
 
-def process_sheet(file_location: String, save_directory: String, negative_xy: bool) -> bool: # returns success
+def process_sheet(file_location: String, save_directory: String, negative_xy: bool, convert_height: bool) -> bool: # returns success
     if not isinstance(file_location, str) or not isinstance(save_directory, str):
         return False
 
@@ -76,7 +76,10 @@ def process_sheet(file_location: String, save_directory: String, negative_xy: bo
 
             record.latitude = abs(e[0]) if not negative_xy else -abs(e[0])
             record.longitude = abs(e[1]) if not negative_xy else -abs(e[1])
-            record.h = round(e[2], 2) if e[2] is not None else str(0)
+            if convert_height:
+                record.h = round(e[2], 2) if e[2] is not None else str(0)
+            else:
+                record.h = height if height is not None else str(0)
 
         record.description = sheet.cell(row=j, column=FEATURE_DESCRIPTION_COL).value
 
