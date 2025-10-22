@@ -8,19 +8,27 @@ from translations import t
 
 import sys
 import os
+import datetime
 
 from PySide6.QtWidgets import (
     QApplication,
     QLabel,
+    QLineEdit,
     QMainWindow,
     QVBoxLayout,
+    QHBoxLayout,
     QWidget,
     QFileDialog,
     QPushButton,
     QCheckBox,
+    QMenuBar,
     QMenu,
+    QFrame,
+    QGroupBox,
+    QSizePolicy,
 )
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QFont, QPalette, QColor
+from PySide6.QtCore import Qt
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -46,42 +54,163 @@ class MainWindow(QMainWindow):
         czech_action.triggered.connect(lambda: self.switch_language("cs"))
         
         # Actions for language menu
-        language_menu.addAction(czech_action)  # Czech first since it's default
+        language_menu.addAction(czech_action)
         language_menu.addAction(english_action)
         
         self.language_actions = {"en": english_action, "cs": czech_action}
 
         self.setWindowTitle(t[self.lang]["window_title"])
 
-        self.label = QLabel() # Label for input file name
+        # Set window size
+        self.setMinimumWidth(500)
+        self.setFixedHeight(450) 
 
-        self.button = QPushButton(t[self.lang]["pick_input"], self) # Button that opens file dialog
+        # Set application style
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #f0f0f0;
+            }
+            QGroupBox {
+                background-color: white;
+                border: 1px solid #cccccc;
+                border-radius: 5px;
+                margin-top: 10px;
+                padding-top: 10px;
+                margin-bottom: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 3px 0 3px;
+                background-color: white;
+            }
+            QPushButton {
+                background-color: #2196F3;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 5px;
+            }
+            QPushButton:hover {
+                background-color: #1976D2;
+            }
+            QPushButton#translateButton {
+                background-color: #4CAF50;
+                font-weight: bold;
+            }
+            QPushButton#translateButton:hover {
+                background-color: #388E3C;
+            }
+            QLabel#statusLabel {
+                font-weight: bold;
+            }
+        """)
+
+        # File Selection Group
+        file_group = QGroupBox(self)
+        file_group.setTitle("File Selection") 
+        file_group.setFixedHeight(150) 
+        file_layout = QVBoxLayout()
+        file_layout.setSpacing(15) 
+        file_layout.setContentsMargins(10, 20, 10, 10) 
+
+        # Input file selection
+        input_layout = QHBoxLayout()
+        input_layout.setSpacing(10) 
+        self.button = QPushButton(t[self.lang]["pick_input"], self)
         self.button.clicked.connect(self.buttonclick)
+        self.button.setMinimumWidth(150)
+        self.button.setFixedHeight(32) 
+        size_policy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.button.setSizePolicy(size_policy)
+        self.label = QLabel()
+        self.label.setWordWrap(True)
+        input_layout.addWidget(self.button)
+        input_layout.addWidget(self.label, 1)
+        file_layout.addLayout(input_layout)
 
-        self.savebutton = QPushButton(t[self.lang]["pick_save_dir"], self) # Button that opens file(folder) dialog
+        # Output directory selection
+        output_layout = QHBoxLayout()
+        output_layout.setSpacing(10)
+        self.savebutton = QPushButton(t[self.lang]["pick_save_dir"], self)
         self.savebutton.clicked.connect(self.savebuttonclick)
+        self.savebutton.setMinimumWidth(150)
+        self.savebutton.setFixedHeight(32) 
+        self.savebutton.setSizePolicy(size_policy)
+        self.savelabel = QLabel()
+        self.savelabel.setWordWrap(True)
+        output_layout.addWidget(self.savebutton)
+        output_layout.addWidget(self.savelabel, 1)
+        file_layout.addLayout(output_layout)
+        
+        # Set minimum height for the group to prevent overlap
+        file_group.setMinimumHeight(120)
 
-        self.savelabel = QLabel() # Label for save directory
+        file_group.setLayout(file_layout)
 
-        self.translatebutton = QPushButton(t[self.lang]["translate"], self) # Button to trigger conversion
-        self.translatebutton.clicked.connect(self.run_translate)
-
-        self.done_label = QLabel("") # Label to display status
-
-        # Checkbox to toggle negative XY
+        # Options Group
+        options_group = QGroupBox(self)
+        options_group.setTitle("Options") 
+        options_group.setFixedHeight(80) 
+        options_layout = QHBoxLayout()
+        options_layout.setSpacing(20) 
+        options_layout.setContentsMargins(10, 15, 10, 10)  
+        
         self.checkbox = QCheckBox(t[self.lang]["negative_xy"], self)
-
         self.convert_height_checkbox = QCheckBox(t[self.lang]["convert_height"], self)
         self.convert_height_checkbox.setChecked(True)
+        
+        # Set fixed height for checkboxes to prevent compression
+        self.checkbox.setFixedHeight(25)
+        self.convert_height_checkbox.setFixedHeight(25)
+        
+        options_layout.addWidget(self.checkbox)
+        options_layout.addWidget(self.convert_height_checkbox)
+        options_layout.addStretch(1) 
+        options_group.setLayout(options_layout)
 
+        # Action Section
+        action_layout = QVBoxLayout()
+        self.translatebutton = QPushButton(t[self.lang]["translate"], self)
+        self.translatebutton.setObjectName("translateButton")  # Set ID for styling
+        self.translatebutton.clicked.connect(self.run_translate)
+        self.translatebutton.setMinimumHeight(40)
+        self.translatebutton.setFixedWidth(200)  
+        
+        self.done_label = QLabel("")
+        self.done_label.setObjectName("statusLabel") 
+        self.done_label.setAlignment(Qt.AlignCenter)
+        self.done_label.setMinimumHeight(30) 
+        
+        # Main Layout
         layout = QVBoxLayout()
-        layout.addWidget(self.button)
-        layout.addWidget(self.label)
-        layout.addWidget(self.savebutton)
-        layout.addWidget(self.savelabel)
-        layout.addWidget(self.checkbox)
-        layout.addWidget(self.convert_height_checkbox)
-        layout.addWidget(self.translatebutton)
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20) 
+        
+        # Create a widget for the file group
+        file_widget = QWidget()
+        file_widget_layout = QVBoxLayout(file_widget)
+        file_widget_layout.setContentsMargins(0, 0, 0, 0)
+        file_widget_layout.addWidget(file_group)
+        
+        # Create a widget for the options group
+        options_widget = QWidget()
+        options_widget_layout = QVBoxLayout(options_widget)
+        options_widget_layout.setContentsMargins(0, 0, 0, 0)
+        options_widget_layout.addWidget(options_group)
+        
+        # Add widgets to main layout
+        layout.addWidget(file_widget)
+        layout.addWidget(options_widget)
+        
+        # Center the translate button
+        translate_container = QHBoxLayout()
+        translate_container.addStretch(1)
+        translate_container.addWidget(self.translatebutton)
+        translate_container.addStretch(1)
+        
+        layout.addLayout(translate_container)
+        layout.addSpacing(10) 
         layout.addWidget(self.done_label)
 
         container = QWidget()
@@ -111,22 +240,49 @@ class MainWindow(QMainWindow):
         # Validate input file
         if not self.fileloc or not (self.fileloc.endswith('.xlsx') or self.fileloc.endswith('.XLSX')):
             self.done_label.setText(t[self.lang]["no_file_error"])
+            self.done_label.setStyleSheet("color: #f44336;")  
             return
             
         # Validate save directory
         if not self.savedir:
             self.done_label.setText(t[self.lang]["no_dir_error"])
+            self.done_label.setStyleSheet("color: #f44336;") 
             return
             
         self.done_label.setText(t[self.lang]["processing"])
+        self.done_label.setStyleSheet("color: #2196F3;")  
         # Force the UI to update immediately
         QApplication.processEvents()
         
-        ok = process_sheet(self.fileloc, self.savedir, self.checkbox.isChecked(), self.convert_height_checkbox.isChecked())
-        if ok:
-            self.done_label.setText(t[self.lang]["done"])
-        else:
+        def save_error(error_msg):
+            try:
+                error_path = os.path.join(self.savedir, "error.txt")
+                with open(error_path, 'w', encoding='utf-8') as f:
+                    f.write(f"Error occurred at: {datetime.datetime.now()}\n")
+                    f.write(f"Input file: {self.fileloc}\n")
+                    f.write(f"Output directory: {self.savedir}\n")
+                    f.write(f"Settings:\n")
+                    f.write(f"- Negative XY: {self.checkbox.isChecked()}\n")
+                    f.write(f"- Convert Height: {self.convert_height_checkbox.isChecked()}\n")
+                    f.write(f"\nError details:\n{error_msg}")
+            except Exception as write_err:
+                print(f"Failed to write error file: {str(write_err)}")
+
+        try:
+            ok = process_sheet(self.fileloc, self.savedir, self.checkbox.isChecked(), self.convert_height_checkbox.isChecked())
+            if ok:
+                self.done_label.setText(t[self.lang]["done"])
+                self.done_label.setStyleSheet("color: #4CAF50;") 
+            else:
+                save_error("Process failed with no specific error message")
+                self.done_label.setText(t[self.lang]["error"])
+                self.done_label.setStyleSheet("color: #f44336;") 
+        except Exception as e:
+            error_msg = f"Error during translation: {str(e)}"
+            print(error_msg) 
+            save_error(error_msg) 
             self.done_label.setText(t[self.lang]["error"])
+            self.done_label.setStyleSheet("color: #f44336;") 
             
     def switch_language(self, new_lang):
         # Update checkmarks in menu
