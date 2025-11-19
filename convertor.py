@@ -14,12 +14,13 @@ CORRTABLE = {}
 QUASIGEOID = {}
 
 
-
 def readCoef(table):
     """
     Načtení tabulky s opravamy
     """
-    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    __location__ = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__))
+    )
     f = open(os.path.join(__location__, "table_yx_3_v1710.dat"), "r")
     for line in f:
         row = line.split()
@@ -31,16 +32,18 @@ def readQuasigeoid():
     """
     Load CR-2005 quasi-geoid model for height corrections
     """
-    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    __location__ = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__))
+    )
     f = open(os.path.join(__location__, "CR-2005_v1005.dat"), "r")
 
     # Read grid parameters
     dims = f.readline().split()
     spacing = f.readline().split()
-    QUASIGEOID['dims'] = (int(dims[0]), int(dims[1]))
-    QUASIGEOID['spacing'] = (float(spacing[2]), float(spacing[3]))
-    QUASIGEOID['start_lat'] = 48.3  # Starting latitude
-    QUASIGEOID['start_lon'] = 11.7  # Starting longitude
+    QUASIGEOID["dims"] = (int(dims[0]), int(dims[1]))
+    QUASIGEOID["spacing"] = (float(spacing[2]), float(spacing[3]))
+    QUASIGEOID["start_lat"] = 48.3  # Starting latitude
+    QUASIGEOID["start_lon"] = 11.7  # Starting longitude
 
     # Read grid data
     for line in f:
@@ -57,15 +60,14 @@ def get_quasigeoid_correction(latitude, longitude):
     """
     Get height correction from CR-2005 quasi-geoid model using bilinear interpolation
     """
-    dlat = QUASIGEOID['spacing'][0]  # 0.016667 degrees
-    dlon = QUASIGEOID['spacing'][1]  # 0.025000 degrees
-    start_lat = QUASIGEOID['start_lat']
-    start_lon = QUASIGEOID['start_lon']
+    dlat = QUASIGEOID["spacing"][0]  # 0.016667 degrees
+    dlon = QUASIGEOID["spacing"][1]  # 0.025000 degrees
+    start_lat = QUASIGEOID["start_lat"]
+    start_lon = QUASIGEOID["start_lon"]
 
     # Find the grid cell indices
     lat_idx = round((latitude - start_lat) / dlat)
     lon_idx = round((longitude - start_lon) / dlon)
-
 
     # Calculate the actual grid point coordinates
     # make sure to only round up lat0 and lon0 after were done doing math with it
@@ -88,10 +90,12 @@ def get_quasigeoid_correction(latitude, longitude):
         wy = (latitude - lat0) / dlat
 
         # Bilinear interpolation
-        correction = (1 - wx) * (1 - wy) * h00 + \
-                    wx * (1 - wy) * h01 + \
-                    (1 - wx) * wy * h10 + \
-                    wx * wy * h11
+        correction = (
+            (1 - wx) * (1 - wy) * h00
+            + wx * (1 - wy) * h01
+            + (1 - wx) * wy * h10
+            + wx * wy * h11
+        )
 
         return correction
     except KeyError:
@@ -102,23 +106,32 @@ def get_quasigeoid_correction(latitude, longitude):
 readQuasigeoid()
 readCoef(CORRTABLE)
 
+
 # Conversion from WGS-84 to JTSK
 def convertToJTSK(latitude, longitude, height: float = 0) -> list[float] | list[None]:
-    if not isinstance(longitude, (int, float)) or not isinstance(latitude, (int, float)):
+    if not isinstance(longitude, (int, float)) or not isinstance(
+        latitude, (int, float)
+    ):
         return [None, None]
     if latitude < 40 or latitude > 60 or longitude < 5 or longitude > 25:
-        raise Exception(f"convertToJTSK coordinates are out of range: longitude {longitude} latitude {latitude} ")
+        raise Exception(
+            f"convertToJTSK coordinates are out of range: longitude {longitude} latitude {latitude} "
+        )
     else:
         # Get quasi-geoid correction
         correction = get_quasigeoid_correction(latitude, longitude)
         if correction is None:
-            raise Exception(f"Point outside quasi-geoid model coverage: longitude {longitude} latitude {latitude}")
+            raise Exception(
+                f"Point outside quasi-geoid model coverage: longitude {longitude} latitude {latitude}"
+            )
 
         # Convert WGS-84 ellipsoidal height to Baltic height system (Bpv)
         bpv_height = height - correction  # Apply quasi-geoid correction
 
         # Convert horizontal coordinates
-        [latitude, longitude] = wgs84_to_bessel(latitude, longitude)  # Height not needed for horizontal conversion
+        [latitude, longitude] = wgs84_to_bessel(
+            latitude, longitude
+        )  # Height not needed for horizontal conversion
         [X05, Y05] = bessel_to_jtsk(latitude, longitude)
         [X, Y] = jtsk05_to_jtsk(X05, Y05)
 
@@ -130,7 +143,9 @@ def convertToWGS84(minusY, minusX, height=0) -> list[float] | list[None]:
     if not isinstance(minusY, (int, float)) or not isinstance(minusX, (int, float)):
         return [None, None]
     if minusY < -905000 or minusY > -400000 or minusX < -1230000 or minusX > -930000:
-        raise Exception(f"convertToWGS84 coordinates are out of range: X {minusY} Y {minusX}")
+        raise Exception(
+            f"convertToWGS84 coordinates are out of range: X {minusY} Y {minusX}"
+        )
     [X05, Y05] = jtsk_to_jtsk05(-minusX, -minusY)
     [latitude, longitude] = jtsk_to_bessel(X05, Y05)
     [latitude, longitude] = bessel_to_wgs84(latitude, longitude, height)
@@ -169,7 +184,6 @@ def bessel_to_wgs84(latitude, longitude, altitude=0.0):
 
 # Conversion from Bessel's lat/lon to jtsk05
 def bessel_to_jtsk(B, L, H=0):
-
     # input conversion
     B = math.radians(B)
     L = math.radians(L)
@@ -185,7 +199,11 @@ def bessel_to_jtsk(B, L, H=0):
     Uq = math.radians(59 + 42 / 60 + 42.69689 / 3600)
     U0 = math.asin(math.sin(fi0) / alfa)
     gfi0 = ((1 + e * math.sin(fi0)) / (1 - e * math.sin(fi0))) ** (alfa * e / 2)
-    k = math.tan(U0 / 2 + math.radians(45)) * (math.tan(fi0 / 2 + math.radians(45)) ** -alfa) * gfi0
+    k = (
+        math.tan(U0 / 2 + math.radians(45))
+        * (math.tan(fi0 / 2 + math.radians(45)) ** -alfa)
+        * gfi0
+    )
 
     # scale and oritin constants
     k1 = 0.9999
@@ -196,23 +214,31 @@ def bessel_to_jtsk(B, L, H=0):
 
     # latitude conversion
     gB = ((1 + e * math.sin(B)) / (1 - e * math.sin(B))) ** (alfa * e / 2)
-    U = 2 * (math.atan(k * math.tan(B / 2 + math.radians(45)) ** alfa * gB**-1) - math.radians(45))
+    U = 2 * (
+        math.atan(k * math.tan(B / 2 + math.radians(45)) ** alfa * gB**-1)
+        - math.radians(45)
+    )
     lam = L + math.radians(17 + 40 / 60)
 
     # oblique coordinate calculation
     dV = alfa * (math.radians(42.5) - lam)
     a_c = math.radians(90) - Uq
 
-    S = math.asin(math.cos(a_c) * math.sin(U) + math.sin(a_c) * math.cos(U) * math.cos(dV))
+    S = math.asin(
+        math.cos(a_c) * math.sin(U) + math.sin(a_c) * math.cos(U) * math.cos(dV)
+    )
     # eps = n * math.atan(sin_d / cos_d)
     D = math.asin(math.cos(U) * math.sin(dV) / math.cos(S))
     eps = n * D
     # rho = rho_0 * math.exp(-n * math.log((1 + sin_s) / cos_s))
 
-    rho = rho_0 * (math.tan(S0 / 2 + math.radians(45)) ** n) * (math.tan(S / 2 + math.radians(45)) ** -n)
+    rho = (
+        rho_0
+        * (math.tan(S0 / 2 + math.radians(45)) ** n)
+        * (math.tan(S / 2 + math.radians(45)) ** -n)
+    )
     Xc = rho * math.cos(eps)
     Yc = rho * math.sin(eps)
-
 
     A1 = 0.2946529277e-01
     A2 = 0.2515965696e-01
@@ -274,7 +300,11 @@ def jtsk_to_bessel(X05, Y05):
     Uq = math.radians(59 + 42 / 60 + 42.69689 / 3600)
     U0 = math.asin(math.sin(fi0) / alfa)
     gfi0 = ((1 + e * math.sin(fi0)) / (1 - e * math.sin(fi0))) ** (alfa * e / 2)
-    k = math.tan(U0 / 2 + math.radians(45)) * (math.tan(fi0 / 2 + math.radians(45)) ** -alfa) * gfi0
+    k = (
+        math.tan(U0 / 2 + math.radians(45))
+        * (math.tan(fi0 / 2 + math.radians(45)) ** -alfa)
+        * gfi0
+    )
     k1 = 0.9999
     N0 = (a * (1 - e2) ** 0.5) / (1 - e2 * math.sin(fi0) ** 2)
     S0 = math.radians(78.5)
@@ -321,8 +351,13 @@ def jtsk_to_bessel(X05, Y05):
     rho = (Xc**2 + Yc**2) ** 0.5
     eps = math.atan(Yc / Xc)
     D = eps / math.sin(S0)
-    S = 2 * (math.atan(((rho_0 / rho) ** (1 / n)) * math.tan(S0 / 2 + math.radians(45))) - math.radians(45))
-    U = math.asin(math.cos(a_c) * math.sin(S) - math.sin(a_c) * math.cos(S) * math.cos(D))
+    S = 2 * (
+        math.atan(((rho_0 / rho) ** (1 / n)) * math.tan(S0 / 2 + math.radians(45)))
+        - math.radians(45)
+    )
+    U = math.asin(
+        math.cos(a_c) * math.sin(S) - math.sin(a_c) * math.cos(S) * math.cos(D)
+    )
     dV = math.asin((math.cos(S) * math.sin(D)) / math.cos(U))
     L = math.radians(24 + 50 / 60) - dV / alfa
     Bi = U
