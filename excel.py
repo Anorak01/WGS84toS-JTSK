@@ -12,6 +12,7 @@ START_ROW = 3
 RECORD_INDEX_COL = 7
 LATITUDE_COL = 9
 LONGITUDE_COL = 10
+DEPTH_COL = 15
 HEIGHT_COL = 34
 FEATURE_DESCRIPTION_COL = 47
 
@@ -20,9 +21,10 @@ class Record:
     latitude: String
     longitude: String
     description: String
-    h: String
+    height: String
+    depth: String
 
-def process_sheet(file_location: String, save_directory: String, negative_xy: bool, convert_height: bool) -> bool: # returns success
+def process_sheet(file_location: String, save_directory: String, negative_xy: bool, convert_height: bool, subtract_depth: bool) -> bool: # returns success
     if not isinstance(file_location, str) or not isinstance(save_directory, str):
         return False
 
@@ -59,6 +61,8 @@ def process_sheet(file_location: String, save_directory: String, negative_xy: bo
 
         height = float(str(sheet.cell(row=j, column=HEIGHT_COL).value).replace(",", "."))
 
+        depth = float(str(sheet.cell(row=j, column=DEPTH_COL).value).replace(",", "."))
+
         if len(str(latitude)) > latitude_max_len:
             latitude_max_len = len(str(latitude))
         if len(str(longitude)) > longitude_max_len:
@@ -67,7 +71,7 @@ def process_sheet(file_location: String, save_directory: String, negative_xy: bo
         if (latitude == 0 or longitude == 0):
             record.latitude = 0
             record.longitude = 0
-            record.h = 0
+            record.height = 0
         else:
             e = convertToJTSK(latitude, longitude, height)
 
@@ -77,9 +81,12 @@ def process_sheet(file_location: String, save_directory: String, negative_xy: bo
             record.latitude = abs(e[0]) if not negative_xy else -abs(e[0])
             record.longitude = abs(e[1]) if not negative_xy else -abs(e[1])
             if convert_height:
-                record.h = round(e[2], 2) if e[2] is not None else str(0)
+                record.height = round(e[2], 2) if e[2] is not None else str(0)
             else:
-                record.h = height if height is not None else str(0)
+                record.height = height if height is not None else str(0)
+
+            if subtract_depth:
+                record.height = record.height - depth
 
         record.description = sheet.cell(row=j, column=FEATURE_DESCRIPTION_COL).value
 
@@ -87,7 +94,7 @@ def process_sheet(file_location: String, save_directory: String, negative_xy: bo
 
     # sort the records just in case
     sorted(records, key=lambda record: record.index)
-    df = pd.DataFrame([(r.index, r.latitude if r.latitude!=0 else str(0), r.longitude if r.longitude!=0 else str(0), r.h if r.h!=0 else str(0), r.description) for r in records]) #, columns=["# Číslo bodu", "Y", "X", "Z", "Popis bodu"])
+    df = pd.DataFrame([(r.index, r.latitude if r.latitude!=0 else str(0), r.longitude if r.longitude!=0 else str(0), r.height if r.height!=0 else str(0), r.description) for r in records]) #, columns=["# Číslo bodu", "Y", "X", "Z", "Popis bodu"])
 
     file = file_location.split("/")
     file_name = file[-1].split(".")[0]

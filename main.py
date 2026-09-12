@@ -157,14 +157,18 @@ class MainWindow(QMainWindow):
 
         self.checkbox = QCheckBox(t[self.lang]["negative_xy"], self)
         self.convert_height_checkbox = QCheckBox(t[self.lang]["convert_height"], self)
-        self.convert_height_checkbox.setChecked(True)
+        self.convert_height_checkbox.setChecked(False)
+        self.subtract_depth_checkbox = QCheckBox(t[self.lang]["subtract_depth"], self)
+        self.subtract_depth_checkbox.setChecked(True)
 
         # Set fixed height for checkboxes to prevent compression
         self.checkbox.setFixedHeight(25)
         self.convert_height_checkbox.setFixedHeight(25)
+        self.subtract_depth_checkbox.setFixedHeight(25)
 
         options_layout.addWidget(self.checkbox)
         options_layout.addWidget(self.convert_height_checkbox)
+        options_layout.addWidget(self.subtract_depth_checkbox)
         options_layout.addStretch(1)
         options_group.setLayout(options_layout)
 
@@ -281,6 +285,7 @@ class MainWindow(QMainWindow):
                 self.savedir,
                 self.checkbox.isChecked(),
                 self.convert_height_checkbox.isChecked(),
+                self.subtract_depth_checkbox.isChecked()
             )
             if ok:
                 self.done_label.setText(t[self.lang]["done"])
