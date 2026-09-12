@@ -28,6 +28,7 @@ from convertor import convertToJTSK
 from excel import process_sheet
 from translations import t
 
+import load_splash
 
 class MainWindow(QMainWindow):
     def __init__(self):
