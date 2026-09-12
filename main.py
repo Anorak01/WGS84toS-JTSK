@@ -4,7 +4,7 @@ import datetime
 import os
 import sys
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSettings
 from PySide6.QtGui import QAction, QColor, QFont, QPalette
 from PySide6.QtWidgets import (
     QApplication,
@@ -33,9 +33,11 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.settings = QSettings("Anorak01", "WGS84toS-JTSK")
+
         self.fileloc = ""
         self.savedir = ""
-        self.lang = "cs"
+        self.lang = self.settings.value("lang", "cs", type=str)
 
         # Menu bar
         menubar = self.menuBar()
@@ -107,7 +109,7 @@ class MainWindow(QMainWindow):
 
         # File Selection Group
         file_group = QGroupBox(self)
-        file_group.setTitle("File Selection")
+        file_group.setTitle(t[self.lang]["file_picker_box"])
         file_group.setFixedHeight(150)
         file_layout = QVBoxLayout()
         file_layout.setSpacing(15)
@@ -156,10 +158,14 @@ class MainWindow(QMainWindow):
         options_layout.setContentsMargins(10, 15, 10, 10)
 
         self.checkbox = QCheckBox(t[self.lang]["negative_xy"], self)
+        self.checkbox.setChecked(self.settings.value("negative_xy", False, type=bool))
+        self.checkbox.checkStateChanged.connect(self.check_changed)
         self.convert_height_checkbox = QCheckBox(t[self.lang]["convert_height"], self)
-        self.convert_height_checkbox.setChecked(False)
+        self.convert_height_checkbox.setChecked(self.settings.value("convert_height", False, type=bool))
+        self.convert_height_checkbox.checkStateChanged.connect(self.check_changed)
         self.subtract_depth_checkbox = QCheckBox(t[self.lang]["subtract_depth"], self)
-        self.subtract_depth_checkbox.setChecked(True)
+        self.subtract_depth_checkbox.setChecked(self.settings.value("subtract_depth", True, type=bool))
+        self.subtract_depth_checkbox.checkStateChanged.connect(self.check_changed)
 
         # Set fixed height for checkboxes to prevent compression
         self.checkbox.setFixedHeight(25)
@@ -243,6 +249,11 @@ class MainWindow(QMainWindow):
         self.savelabel.setText(t[self.lang]["save_directory"] + str(fileName))
         self.savedir = str(fileName)
 
+    def check_changed(self):
+        self.settings.setValue("negative_xy", self.checkbox.isChecked())
+        self.settings.setValue("convert_height", self.convert_height_checkbox.isChecked())
+        self.settings.setValue("subtract_depth", self.subtract_depth_checkbox.isChecked())
+
     def run_translate(self):
         # Validate input file
         if not self.fileloc or not (
@@ -306,6 +317,7 @@ class MainWindow(QMainWindow):
         for lang, action in self.language_actions.items():
             action.setChecked(lang == new_lang)
 
+        self.settings.setValue("lang", new_lang)
         self.lang = new_lang
         # Update menu text
         self.menuBar().findChild(QMenu).setTitle(t[self.lang]["language_menu"])
@@ -319,6 +331,7 @@ class MainWindow(QMainWindow):
         self.translatebutton.setText(t[self.lang]["translate"])
         self.checkbox.setText(t[self.lang]["negative_xy"])
         self.convert_height_checkbox.setText(t[self.lang]["convert_height"])
+        self.subtract_depth_checkbox.setText(t[self.lang]["subtract_depth"])
 
         # Update labels if they have content
         if self.fileloc:

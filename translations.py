@@ -17,7 +17,8 @@ t = {
         "processing": "Processing...",
         "no_file_error": "Please select a valid Excel file first",
         "no_dir_error": "Please select a save directory first",
-        "subtract_depth": "Subtract Depth"
+        "subtract_depth": "Subtract Depth",
+        "file_picker_box": "File Selection"
     },
     "cs": {
         "window_title": "Překladač",
@@ -37,6 +38,7 @@ t = {
         "processing": "Zpracovávání...",
         "no_file_error": "Nejprve vyberte platný Excel soubor",
         "no_dir_error": "Nejprve vyberte cílovou složku",
-        "subtract_depth": "Odečíst hloubku"
+        "subtract_depth": "Odečíst hloubku",
+        "file_picker_box": "Výběr souborů"
     }
 }
