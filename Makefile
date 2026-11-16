@@ -15,6 +15,6 @@ package:
 	which python3; \
 	pip install -r requirements.txt; \
 	pip install pyinstaller; \
-	python3 -m PyInstaller --onefile --add-data "./table_yx_3_v1710.dat:." --add-data "./CR-2005_v1005.dat:." --noconsole main.py; \
+	python3 -m PyInstaller --splash "./pyinstaller.png" --onefile --add-data "./table_yx_3_v1710.dat:." --add-data "./CR-2005_v1005.dat:." --noconsole main.py; \
 	rm -rf tempvenv main.spec build; \
 	)

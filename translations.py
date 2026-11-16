@@ -16,7 +16,21 @@ t = {
         "language_cs": "Czech",
         "processing": "Processing...",
         "no_file_error": "Please select a valid Excel file first",
-        "no_dir_error": "Please select a save directory first"
+        "no_dir_error": "Please select a save directory first",
+        "subtract_depth": "Subtract Depth",
+        "file_picker_box": "File Selection",
+        "options_box": "Options",
+        "columns_box": "Column Names",
+        "record_index_column": "Record Index",
+        "latitude_column": "Latitude",
+        "longitude_column": "Longitude",
+        "depth_column": "Depth",
+        "height_column": "Height",
+        "description_column": "Feature Description",
+        "reset_column": "Reset to default",
+        "file_valid": "File is valid",
+        "column_not_found": "Cannot find column {0} by name '{1}'",
+        "file_read_error": "File cannot be read"
     },
     "cs": {
         "window_title": "Překladač",
@@ -35,6 +49,20 @@ t = {
         "language_cs": "Česky",
         "processing": "Zpracovávání...",
         "no_file_error": "Nejprve vyberte platný Excel soubor",
-        "no_dir_error": "Nejprve vyberte cílovou složku"
+        "no_dir_error": "Nejprve vyberte cílovou složku",
+        "subtract_depth": "Odečíst hloubku",
+        "file_picker_box": "Výběr souborů",
+        "options_box": "Možnosti",
+        "columns_box": "Názvy sloupců",
+        "record_index_column": "Číslo záznamu",
+        "latitude_column": "Zem. šířka",
+        "longitude_column": "Zem. délka",
+        "depth_column": "Hloubka",
+        "height_column": "Výška",
+        "description_column": "Popis bodu",
+        "reset_column": "Obnovit výchozí",
+        "file_valid": "Soubor je platný",
+        "column_not_found": "Nelze najít sloupec {0} podle názvu '{1}'",
+        "file_read_error": "Soubor nelze přečíst"
     }
 }
